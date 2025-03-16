@@ -40,8 +40,8 @@ if "skills_analyzed" not in st.session_state:
 # MySQL database connection
 def create_connection():
     return mysql.connector.connect(
-        host='root',
-        user='your_user',
+        host='127.0.0.1',
+        user='root',
         password='Ram@2004',
         database='resume_analysis_db'
     )
