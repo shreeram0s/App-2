@@ -48,16 +48,20 @@ def create_connection():
 
 # Function to save analysis results to MySQL
 def save_analysis_to_db(resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills):
-    connection = create_connection()
-    cursor = connection.cursor()
-    insert_query = """
-    INSERT INTO resume_analysis (resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills)
-    VALUES (%s, %s, %s, %s, %s, %s)
-    """
-    cursor.execute(insert_query, (resume_text, job_text, matching_score, ', '.join(resume_skills), ', '.join(job_skills), ', '.join(missing_skills)))
-    connection.commit()
-    cursor.close()
-    connection.close()
+    try:
+        connection = create_connection()
+        cursor = connection.cursor()
+        insert_query = """
+        INSERT INTO resume_analysis (resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, (resume_text, job_text, matching_score, ', '.join(resume_skills), ', '.join(job_skills), ', '.join(missing_skills)))
+        connection.commit()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        cursor.close()
+        connection.close()
 
 # Function to fetch courses from YouTube
 def fetch_youtube_courses(skill):
