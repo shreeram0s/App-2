@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 import pandas as pd
@@ -10,6 +9,7 @@ from sentence_transformers import SentenceTransformer, util
 import googleapiclient.discovery
 import spacy
 from spacy.cli import download
+import mysql.connector
 
 model_name = "en_core_web_md"
 
@@ -37,12 +37,34 @@ if "skills_analyzed" not in st.session_state:
     st.session_state.resume_skills = []
     st.session_state.job_skills = []
 
+# MySQL database connection
+def create_connection():
+    return mysql.connector.connect(
+        host='your_host',
+        user='your_user',
+        password='your_password',
+        database='your_database'
+    )
+
+# Function to save analysis results to MySQL
+def save_analysis_to_db(resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills):
+    connection = create_connection()
+    cursor = connection.cursor()
+    insert_query = """
+    INSERT INTO resume_analysis (resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(insert_query, (resume_text, job_text, matching_score, ', '.join(resume_skills), ', '.join(job_skills), ', '.join(missing_skills)))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
 # Function to fetch courses from YouTube
 def fetch_youtube_courses(skill):
     youtube = googleapiclient.discovery.build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=YOUTUBE_API_KEY)
     request = youtube.search().list(q=f"{skill} course", part="snippet", maxResults=5, type="video")
     response = request.execute()
-    
+
     return [
         {"Title": item["snippet"]["title"], "Channel": item["snippet"]["channelTitle"], "Video Link": f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'}
         for item in response["items"]
@@ -125,6 +147,9 @@ if resume_file and job_file:
         st.session_state.job_skills = job_skills
         st.session_state.missing_skills = missing_skills
         st.session_state.matching_score = calculate_matching_score(resume_text, job_text)
+
+        # Save analysis to database
+        save_analysis_to_db(resume_text, job_text, st.session_state.matching_score, resume_skills, job_skills, missing_skills)
 
     if st.session_state.skills_analyzed:
         st.subheader("🔍 Extracted Skills")
