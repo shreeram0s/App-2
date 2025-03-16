@@ -40,10 +40,10 @@ if "skills_analyzed" not in st.session_state:
 # MySQL database connection
 def create_connection():
     return mysql.connector.connect(
-        host='your_host',
+        host='root',
         user='your_user',
-        password='your_password',
-        database='your_database'
+        password='Ram@2004',
+        database='resume_analysis_db'
     )
 
 # Function to save analysis results to MySQL
