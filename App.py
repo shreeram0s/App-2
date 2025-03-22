@@ -9,10 +9,9 @@ from sentence_transformers import SentenceTransformer, util
 import googleapiclient.discovery
 import spacy
 from spacy.cli import download
-import mysql.connector
 
+# Load spaCy model
 model_name = "en_core_web_md"
-
 try:
     nlp = spacy.load(model_name)
 except OSError:
@@ -36,7 +35,6 @@ if "skills_analyzed" not in st.session_state:
     st.session_state.matching_score = 0.0
     st.session_state.resume_skills = []
     st.session_state.job_skills = []
-
 
 # Function to fetch courses from YouTube
 def fetch_youtube_courses(skill):
@@ -98,6 +96,11 @@ def plot_skill_distribution_pie(resume_skills, job_skills):
     axes[1].pie(job_sizes, labels=job_labels, autopct='%1.1f%%', startangle=90)
     axes[1].set_title("Job Required Skills Distribution")
     st.pyplot(fig)
+
+# Placeholder for saving analysis to database
+def save_analysis_to_db(resume_text, job_text, matching_score, resume_skills, job_skills, missing_skills):
+    # Implement your database saving logic here
+    pass
 
 # Streamlit UI
 st.title("📄 AI Resume Analyzer & Skill Enhancer")
