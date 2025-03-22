@@ -4,7 +4,7 @@ sentence-transformers
 mysql-connector-python
 sqlalchemy
 huggingface-hub
-spacy
+spacy==3.5.0
 pdfplumber
 docx2txt
 google-api-python-client
